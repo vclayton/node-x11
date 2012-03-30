@@ -42,7 +42,7 @@ function ManageWindow(wid)
 			} else if (ev.type == 6) {
 				winX = dragStart.winX + ev.rootx - dragStart.rootx;
 				winY = dragStart.winY + ev.rooty - dragStart.rooty;
-				X.ConfigureWindow({window:fid, value_mask: { x:winX, y:winY}});
+				X.ConfigureWindow({window:fid, value_mask: { X:winX, Y:winY}});
 			}
 		});
 		X.ChangeSaveSet({mode: 1, window: wid});
@@ -80,7 +80,7 @@ x11.createClient(function(display) {
 		return;
 	} else if (ev.type === x11.event.ConfigureRequest)
 	{
-		X.ConfigureWindow({window: ev.wid, value_mask: {width: ev.width, height: ev.height}});
+		X.ConfigureWindow({window: ev.wid, value_mask: {Width: ev.width, Height: ev.height}});
 	}
 	console.log(ev);
 });

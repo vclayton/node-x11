@@ -4,6 +4,8 @@ var fs = require('fs')
   , xProto = JSON.parse(fs.readFileSync('protocols/xProtocol.json'))
   , data = { requests: xProto.request
            , structs: xProto.struct
+           , events: xProto.event
+           , eventcopy: eventRefs()
            , getValueMask: getValueMask
            , getDelim: getDelim
            , enumVal: enumVal
@@ -29,7 +31,7 @@ var fs = require('fs')
            , constructOp: constructOp
            }
 
-;['requests', 'structs'].forEach(function(name) {
+;['requests', 'structs', 'events'].forEach(function(name) {
   var tplFile = fs.readFileSync('stubs/' + name + '.tpl').toString().replace(/\n\s*{{/g, '{{').replace(/}}\s*$/g, '}}')
   fs.writeFileSync('lib/x11/autogen/' + name + '.js', jqtpl.tmpl(tplFile, data))
 })
@@ -157,6 +159,15 @@ function indent(num, lines) {
     return line ? indent + line : ''
   }).join('\n')
 }
+
+function eventRefs() {
+  var refs = {};
+  for (var c in xProto.eventcopy) {
+    refs[xProto.eventcopy[c].ref] = { name: c, number: xProto.eventcopy[c].number };
+  }
+  return refs;
+}
+
 
 function getFieldRef(name, field, obj) { //todo read operators appropriately
   return field.fieldType == 'valueparam' ? field['value-mask-name']
