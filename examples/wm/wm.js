@@ -2,7 +2,7 @@ var x11 = require('../../lib/x11');
 var EventEmitter = require('events').EventEmitter;
 
 var X, root;
-var events = x11.eventMask.Button1Motion|x11.eventMask.ButtonPress|x11.eventMask.ButtonRelease|x11.eventMask.SubstructureNotify|x11.eventMask.SubstructureRedirect
+var events = x11.EventMask.Button1Motion|x11.EventMask.ButtonPress|x11.EventMask.ButtonRelease|x11.EventMask.SubstructureNotify|x11.EventMask.SubstructureRedirect
 var frames = {};
 var dragStart = null;
 
@@ -36,12 +36,12 @@ function ManageWindow(wid)
 			{
 			   X.DestroyWindow({window: fid});
 			} else if (ev.type == 4) {
-				dragStart = { rootx: ev.rootx, rooty: ev.rooty, x: ev.x, y: ev.y, winX: winX, winY: winY };
+				dragStart = { rootx: ev.root_x, rooty: ev.root_y, x: ev.event_x, y: ev.event_y, winX: winX, winY: winY };
 			} else if (ev.type == 5) {
 				dragStart = null;
 			} else if (ev.type == 6) {
-				winX = dragStart.winX + ev.rootx - dragStart.rootx;
-				winY = dragStart.winY + ev.rooty - dragStart.rooty;
+				winX = dragStart.winX + ev.root_x - dragStart.rootx;
+				winY = dragStart.winY + ev.root_y - dragStart.rooty;
 				X.ConfigureWindow({window:fid, value_mask: { X:winX, Y:winY}});
 			}
 		});
@@ -58,7 +58,7 @@ x11.createClient(function(display) {
 	X = display.client;
 	root = display.screen[0].root;
 	console.log('root = ' + root);
-	X.ChangeWindowAttributes( {window: root, value_mask: { EventMask: x11.eventMask.SubstructureRedirect }}, function(err) {
+	X.ChangeWindowAttributes( {window: root, value_mask: { EventMask: x11.EventMask.SubstructureRedirect }}, function(err) {
 	    if (err.error == 10)
 	    {
 	        console.error('Error: another window manager already running.');

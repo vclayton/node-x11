@@ -5,6 +5,8 @@ var fs = require('fs')
   , data = { requests: xProto.request
            , structs: xProto.struct
            , events: xProto.event
+           , enums: xProto.enum
+           , atomCounter: { val: 1}
            , eventcopy: eventRefs()
            , getValueMask: getValueMask
            , getDelim: getDelim
@@ -31,12 +33,13 @@ var fs = require('fs')
            , constructOp: constructOp
            }
 
-;['requests', 'structs', 'events'].forEach(function(name) {
+;['requests', 'structs', 'events', 'enums'].forEach(function(name) {
   var tplFile = fs.readFileSync('stubs/' + name + '.tpl').toString().replace(/\n\s*{{/g, '{{').replace(/}}\s*$/g, '}}')
   fs.writeFileSync('lib/x11/autogen/' + name + '.js', jqtpl.tmpl(tplFile, data))
 })
 
 function getValueMask(requestName) {
+  
   return typeLookup.valuemaskEnum[requestName] && xProto.enum[typeLookup.valuemaskEnum[requestName]].field
 }
 
@@ -44,9 +47,10 @@ function getDelim(i, first, rest) {
   return i == 0 ? (first != null ? first : '{') : (rest != null ? rest : ',')
 }
 
-function enumVal(val) {
+function enumVal(val, atomCount) {
   return val.value ? val.value
   : val.bit ? 1 << val.bit
+  : val.name.toUpperCase() == val.name ? atomCount.val++
   : 0
 }
 
